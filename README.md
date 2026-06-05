@@ -1,189 +1,328 @@
-
 # 🧠 Brain Tumor Segmentation using U-Net
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow">
-  <img src="https://img.shields.io/badge/Keras-D00000?style=for-the-badge&logo=keras&logoColor=white" alt="Keras">
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://github.com/ZeyadArafa/Brain-Tumor-Segmentation-UNet/stargazers">
-    <img src="https://img.shields.io/github/stars/ZeyadArafa/Brain-Tumor-Segmentation-UNet?style=social" alt="Stars">
-  </a>
-  <a href="https://github.com/ZeyadArafa/Brain-Tumor-Segmentation-UNet/network/members">
-    <img src="https://img.shields.io/github/forks/ZeyadArafa/Brain-Tumor-Segmentation-UNet?style=social" alt="Forks">
-  </a>
-</p>
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
+![Keras](https://img.shields.io/badge/Keras-Deep%20Learning-D00000?style=for-the-badge&logo=keras&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Colab](https://img.shields.io/badge/Google%20Colab-Ready-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 
-<p align="center">
-  <b>A Deep Learning approach to automate the detection of brain tumors from MRI scans using semantic segmentation.</b>
-  <br>
-  <i>Pixel-level accuracy. Medical-grade precision.</i>
-</p>
+**A deep learning solution for automated brain tumor detection and segmentation using semantic segmentation with U-Net architecture**
+
+[📖 Overview](#-overview) •
+[🏗️ Architecture](#️-model-architecture) •
+[📊 Results](#-results) •
+[🚀 Quick Start](#-quick-start) •
+[📁 Dataset](#-dataset-structure)
 
 ---
 
-## 📋 Table of Contents
+</div>
 
-1. [📖 Project Overview](#-project-overview)
-2. [🏗️ Methodology & Architecture](#%EF%B8%8F-methodology--architecture)
-3. [📂 Dataset Structure](#-dataset-structure)
-4. [📊 Performance Metrics](#-performance-metrics)
-5. [🚀 Installation & Usage](#-installation--usage)
-6. [🖼️ Visualizations](#%EF%B8%8F-visualizations)
-7. [🛣️ Roadmap](#%EF%B8%8F-roadmap)
-8. [👨‍💻 Author](#%EF%B8%8F-author)
+## 📖 Overview
 
----
+This project implements a **U-Net convolutional neural network** for binary semantic segmentation of brain tumors from MRI scans. The model accurately identifies and segments tumor regions, providing pixel-level precision that is crucial for medical diagnosis and treatment planning.
 
-## 📖 Project Overview
+### ✨ Key Features
 
-Diagnosing brain tumors manually from MRI scans is time-consuming and prone to human error. This project leverages **Deep Learning** to automate this process.
-
-Using a custom **U-Net architecture**, the model learns to identify tumor regions pixel-by-pixel, outputting a binary mask where:
-* **White (1):** Tumor Region
-* **Black (0):** Healthy Tissue
-
-### Key Features
-* ✅ **End-to-End Pipeline:** From raw image loading to binary mask prediction.
-* ✅ **Custom U-Net:** Built from scratch with Dropout regularization to prevent overfitting.
-* ✅ **IoU Metric:** Optimization using Intersection over Union (Jaccard Index) for imbalanced data.
-* ✅ **Optimized Training:** Implements `tf.data` for efficient GPU utilization.
+| Feature | Description |
+|---------|-------------|
+| 🎯 **Binary Segmentation** | Precise tumor vs. healthy tissue classification |
+| 📈 **IoU Metric** | Intersection over Union for accurate evaluation |
+| 🔄 **Data Pipeline** | Efficient TensorFlow data loading with prefetching |
+| 🎛️ **Dropout Regularization** | Prevents overfitting with 30% dropout |
+| ⚡ **GPU Accelerated** | Optimized for NVIDIA T4 GPU on Google Colab |
 
 ---
 
-## 🏗️ Methodology & Architecture 
+## 🏗️ Model Architecture
 
-The model follows the standard **U-Net** encoder-decoder design, specifically tuned for 128x128 inputs.
-
-| Component | Description |
-| :--- | :--- |
-| **Encoder** | Captures context using convolutional layers and Max Pooling (Downsampling). |
-| **Bottleneck** | The bridge between encoder and decoder, extracting high-level features. |
-| **Decoder** | Enables precise localization using Transposed Convolutions (Upsampling). |
-| **Skip Connections** | Concatenates encoder features with decoder layers to recover spatial details lost during pooling. |
-
-**Hyperparameters:**
-* **Input Size:** `128 x 128 x 3`
-* **Batch Size:** `16`
-* **Optimizer:** `Adam (lr=0.001)`
-* **Loss Function:** `Binary Crossentropy`
-
----
-
-## 📂 Dataset Structure
-
-The project expects the data to be organized in the following directory tree:
-
-```text
-Brain-Tumor-Segmentation-UNet/
-│
-├── dataset/
-│   ├── images/          # Original MRI Scans (RGB)
-│   │   ├── image_001.png
-│   │   └── ...
-│   └── masks/           # Binary Ground Truth Masks
-│       ├── mask_001.png
-│       └── ...
-│
-├── UNET_Brain_Tumor_Quiz.ipynb   # Main Training Notebook
-├── README.md                     # Project Documentation
-└── requirements.txt              # Dependencies
+The implementation follows the classic **U-Net encoder-decoder architecture** with skip connections, specifically designed for biomedical image segmentation.
 
 ```
+                           U-Net Architecture
+    ┌─────────────────────────────────────────────────────────────┐
+    │                                                             │
+    │   INPUT (128×128×3)                    OUTPUT (128×128×1)   │
+    │         │                                      ▲            │
+    │         ▼                                      │            │
+    │   ┌─────────┐                            ┌─────────┐        │
+    │   │ Conv 64 │ ─────────────────────────► │ Conv 64 │        │
+    │   └────┬────┘      Skip Connection       └────▲────┘        │
+    │        │ MaxPool                              │ UpSample    │
+    │        ▼                                      │             │
+    │   ┌──────────┐                          ┌──────────┐        │
+    │   │ Conv 128 │ ────────────────────────►│ Conv 128 │        │
+    │   └────┬─────┘     Skip Connection      └────▲─────┘        │
+    │        │ MaxPool                              │ UpSample    │
+    │        ▼                                      │             │
+    │   ┌──────────┐                          ┌──────────┐        │
+    │   │ Conv 256 │ ────────────────────────►│ Conv 256 │        │
+    │   └────┬─────┘     Skip Connection      └────▲─────┘        │
+    │        │ MaxPool                              │ UpSample    │
+    │        ▼                                      │             │
+    │   ┌──────────┐                          ┌──────────┐        │
+    │   │ Conv 512 │ ────────────────────────►│ Conv 512 │        │
+    │   └────┬─────┘     Skip Connection      └────▲─────┘        │
+    │        │ MaxPool                              │ UpSample    │
+    │        ▼                                      │             │
+    │   ┌────────────────────────────────────────────┐            │
+    │   │            BOTTLENECK (Conv 1024)          │            │
+    │   └────────────────────────────────────────────┘            │
+    │                                                             │
+    └─────────────────────────────────────────────────────────────┘
+```
+
+### 🔧 Architecture Details
+
+| Component | Configuration |
+|-----------|--------------|
+| **Input Shape** | 128 × 128 × 3 (RGB) |
+| **Encoder Blocks** | 4 (64 → 128 → 256 → 512 filters) |
+| **Bottleneck** | 1024 filters |
+| **Decoder Blocks** | 4 (512 → 256 → 128 → 64 filters) |
+| **Convolution** | 3×3 kernels, 'same' padding, ReLU activation |
+| **Pooling** | 2×2 MaxPooling |
+| **Upsampling** | Conv2DTranspose (3×3, stride 2) |
+| **Output** | Sigmoid activation (binary mask) |
+| **Total Parameters** | ~31 Million |
 
 ---
 
-## 📊 Performance Metrics
+## 📊 Results
 
-The model is evaluated using **Accuracy** and **IoU (Intersection over Union)**. IoU is critical in medical segmentation because background pixels often vastly outnumber tumor pixels.
+### Training Performance (15 Epochs)
 
-| Metric | Training Score | Validation Score |
-| --- | --- | --- |
-| **Accuracy** | ~99.4% | ~99.1% |
-| **IoU Score** | ~0.60 | ~0.56 |
+<table>
+<tr>
+<td>
 
-> **Note:** An IoU score > 0.5 is generally considered a good overlap for complex medical segmentation tasks without extensive pre-training.
+| Metric | Training | Validation |
+|--------|----------|------------|
+| **Accuracy** | 99.36% | 99.10% |
+| **IoU Score** | 0.607 | 0.564 |
+| **Loss** | 0.018 | 0.029 |
+
+</td>
+<td>
+
+```
+Training Progress:
+━━━━━━━━━━━━━━━━━ 99.36% Accuracy
+━━━━━━━━━━━━━━━━━ 60.7% IoU
+━━━━━━━━━━━━━━━━━ 0.018 Loss
+```
+
+</td>
+</tr>
+</table>
+
+### 📈 Training Curves
+
+The model shows consistent improvement across all metrics with minimal overfitting:
+
+- **IoU**: Progressive improvement from 0.006 → 0.607
+- **Accuracy**: Stable high accuracy from 96.32% → 99.36%
+- **Loss**: Smooth convergence from 0.438 → 0.018
 
 ---
 
-## 🚀 Installation & Usage
+## 🎯 Why IoU over Accuracy?
 
-### 1. Clone the Repository
-
-```bash
-git clone [https://github.com/ZeyadArafa/Brain-Tumor-Segmentation-UNet.git](https://github.com/ZeyadArafa/Brain-Tumor-Segmentation-UNet.git)
-cd Brain-Tumor-Segmentation-UNet
+> **Critical Insight**: In medical imaging, accuracy can be misleading!
 
 ```
-
-### 2. Install Dependencies
-
-Ensure you have Python installed, then run:
-
-```bash
-pip install -r requirements.txt
-
+┌──────────────────────────────────────────────────────────────────┐
+│                     THE CLASS IMBALANCE PROBLEM                  │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   Brain MRI Image:    ████████████████████████████████████████   │
+│   (98% Background)    ████████████████████████████████████████   │
+│                       ██████████████████████  ← 2% Tumor        │
+│                                                                  │
+│   ❌ A model predicting "all background" = 98% Accuracy          │
+│   ✅ IoU catches this: IoU = 0 (no tumor overlap!)               │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-*Alternatively, you can install the main packages directly:*
+### IoU Formula
+
+$$IoU = \frac{|P \cap G|}{|P \cup G|} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives} + \text{False Negatives}}$$
+
+Where:
+- **P** = Predicted mask
+- **G** = Ground truth mask
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
 
 ```bash
 pip install tensorflow numpy matplotlib
-
 ```
 
-### 3. Run the Training
+### Option 1: Run on Google Colab (Recommended)
 
-You can open the notebook `UNET_Brain_Tumor_Quiz.ipynb` in **Google Colab** or **Jupyter Notebook**.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/)
 
-**If using Google Colab:**
+1. Upload the notebook to Google Colab
+2. Enable GPU: `Runtime → Change runtime type → T4 GPU`
+3. Mount Google Drive and update data paths
+4. Run all cells!
 
-1. Upload your `dataset` folder to Google Drive.
-2. Mount Drive in the notebook:
+### Option 2: Local Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/ZeyadArafa/Brain-Tumor-Segmentation-UNet.git
+cd Brain-Tumor-Segmentation-UNet
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the notebook
+jupyter notebook UNET_Brain_Tumor_Quiz.ipynb
+```
+
+---
+
+## 📁 Dataset Structure
+
+```
+BrainTumor/
+├── images/
+│   ├── brain_001.png
+│   ├── brain_002.png
+│   ├── brain_003.png
+│   └── ... (3064 total images)
+│
+└── masks/
+    ├── brain_001_mask.png
+    ├── brain_002_mask.png
+    ├── brain_003_mask.png
+    └── ... (3064 corresponding masks)
+```
+
+### Dataset Statistics
+
+| Property | Value |
+|----------|-------|
+| **Total Samples** | 3,064 |
+| **Training Set** | 2,452 (80%) |
+| **Validation Set** | 612 (20%) |
+| **Image Size** | 128 × 128 pixels |
+| **Image Channels** | RGB (3 channels) |
+| **Mask Type** | Binary (0 = background, 1 = tumor) |
+
+---
+
+## 🔧 Configuration
 
 ```python
-from google.colab import drive
-drive.mount('/content/drive')
+# Hyperparameters
+IMG_WIDTH = 128
+IMG_HEIGHT = 128
+CHANNELS = 3
+BATCH_SIZE = 16
+EPOCHS = 15
+LEARNING_RATE = 0.001
+DROPOUT_RATE = 0.3
+VAL_SPLIT = 0.2
 
+# Optimizer & Loss
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+loss = 'binary_crossentropy'
+metrics = ['accuracy', BinaryIoU(target_class_ids=[1])]
 ```
 
-3. Update the `DATA_DIR` path in the code to point to your folder.
+---
+
+## 📂 Project Structure
+
+```
+Brain-Tumor-Segmentation-UNet/
+│
+├── 📓 UNET_Brain_Tumor_Quiz.ipynb    # Main training notebook
+├── 📄 README.md                       # Project documentation
+├── 📋 requirements.txt                # Python dependencies
+├── 📜 LICENSE                         # MIT License
+│
+├── 📁 data/                           # Dataset directory
+│   ├── images/                        # MRI scan images
+│   └── masks/                         # Segmentation masks
+│
+└── 📁 models/                         # Saved models
+    └── unet_brain_tumor.h5            # Trained model weights
+```
 
 ---
 
-## 🖼️ Visualizations
+## 🛠️ Tech Stack
 
-The notebook includes a visualization block that compares the **Original Image**, the **Ground Truth Mask**, and the **Predicted Mask**.
+<div align="center">
 
-| MRI Scan | Ground Truth | Prediction |
-| --- | --- | --- |
-| 🖼️ | 🏁 | 🤖 |
-| *(Original)* | *(Actual Tumor)* | *(AI Output)* |
+| Technology | Purpose |
+|------------|---------|
+| ![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=flat&logo=tensorflow&logoColor=white) | Deep Learning Framework |
+| ![Keras](https://img.shields.io/badge/Keras-D00000?style=flat&logo=keras&logoColor=white) | High-level Neural Network API |
+| ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white) | Numerical Computing |
+| ![Matplotlib](https://img.shields.io/badge/Matplotlib-11557c?style=flat) | Visualization |
+| ![Google Colab](https://img.shields.io/badge/Colab-F9AB00?style=flat&logo=googlecolab&logoColor=white) | Cloud Computing |
+
+</div>
 
 ---
 
-## 🛣️ Roadmap
+## 🔮 Future Improvements
 
-* [x] Implement U-Net Architecture
-* [x] Integrate IoU Metric
-* [ ] Add Data Augmentation (Rotation, Flip) to improve generalization
-* [ ] Experiment with Dice Loss function
-* [ ] Deploy model as a web app using Streamlit
+- [ ] 🎨 **Data Augmentation** — Rotation, flipping, elastic deformations
+- [ ] 📐 **Higher Resolution** — 256×256 or 512×512 input images
+- [ ] 🏋️ **Transfer Learning** — Pre-trained encoder (ResNet, EfficientNet)
+- [ ] 📉 **Dice Loss** — Combined BCE + Dice loss function
+- [ ] 🔄 **Attention U-Net** — Add attention gates for better localization
+- [ ] 📱 **Model Deployment** — TensorFlow Lite / ONNX export
+- [ ] 🌐 **Web Interface** — Streamlit or Gradio demo
+
+---
+
+## 📚 References
+
+- [U-Net: Convolutional Networks for Biomedical Image Segmentation](https://arxiv.org/abs/1505.04597) — Ronneberger et al., 2015
+- [TensorFlow Image Segmentation Tutorial](https://www.tensorflow.org/tutorials/images/segmentation)
+- [Keras Documentation](https://keras.io/api/)
 
 ---
 
 ## 👨‍💻 Author
 
-**Zeyad Ayman** ([@ZeyadArafa](https://github.com/ZeyadArafa))
+<div align="center">
 
-* 🎓 **Computer Engineering Student**
-* 💻 **Interests:** AI, Computer Vision, Cybersecurity, DevOps, Software Engineering
+### **Zeyad Ayman**
+
+[![GitHub](https://img.shields.io/badge/GitHub-ZeyadArafa-181717?style=for-the-badge&logo=github)](https://github.com/ZeyadArafa)
+
+</div>
 
 ---
 
-<p align="center">
-<i>"Deep learning can save lives — one pixel at a time."</i>
-</p>
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+### ⭐ Star this repository if you found it helpful!
+
+Made with ❤️ and 🧠 for medical AI research
+
+</div>
